@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Balancer</string>
+    <string name="action_settings" translatable="false">Settings</string>
+    <string name="add_payment">ADD PAYMENT</string>
+    <string name="price">Price</string>
+    <string name="item_name">Name</string>
+    <string name="change_category">CHANGE CATEGORY</string>
+    <string name="filter">FILTER</string>
+    <string name="from">FROM</string>
+    <string name="to">TO</string>
+    <string name="min">MIN</string>
+    <string name="max">MAX</string>
+    <string name="find">Find</string>
+    <string name="delete_payment">DELETE PAYMENT</string>
+    <string name="err_wrong_item_name">Item\'s name should not contain special characters</string>
+    <string name="category_name">Category\'s Name</string>
+    <string name="add_category">ADD CATEGORY</string>
+    <string name="cat_exists">Already exists</string>
+    <string name="illegal_chars">Illegal Characters</string>
+    <string name="description_optional">Description (optional)</string>
+    <string name="delete_msg_rlly">Do you really want to delete</string>
+    <string name="selected_payments">selected payments?</string>
+    <string name="edit_payment">EDIT PAYMENT</string>
+    <string name="category">CAT...</string>
+    <string name="selected">Selected</string>
+</resources>

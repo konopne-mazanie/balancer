@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="viewmodel"
+            type="com.uhreckysw.balancer.ui.main_activity.LimitUIElem" />
+    </data>
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/rootView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp"
+    >
+
+    <TextView
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/item_right_caption"
+        app:layout_constraintBottom_toBottomOf="@id/item_right_caption"
+
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+        android:textAlignment="viewStart"
+        android:id="@+id/item_left_caption"
+        android:text="@{viewmodel.name}"
+        android:textSize="18sp" />
+    <TextView
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:id="@+id/item_right_caption"
+        android:textSize="25sp"
+        android:text="@{viewmodel.sum}"
+        />
+    <TextView
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/item_right_caption"
+        app:layout_constraintEnd_toStartOf="@id/description_area"
+
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="10dp"
+
+        android:id="@+id/item_bottom_caption"
+        android:text="@{viewmodel.bottom_caption}"
+        android:textSize="15sp" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/item_right_caption"
+        android:layout_marginTop="3dp"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/description_area"
+        android:visibility="@{viewmodel.unpacked ? View.VISIBLE : View.GONE}"
+        >
+
+
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/delete_button"
+            android:src="@drawable/imagebutton_selector_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:scaleY="1.2"
+            android:scaleX="1.2"
+            android:padding="2dp"
+            android:layout_marginEnd="5dp"
+
+            app:layout_constraintEnd_toStartOf="@id/edit_button"
+            app:layout_constraintTop_toTopOf="parent" />
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/edit_button"
+            android:src="@drawable/imagebutton_selector_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:scaleY="1.5"
+            android:scaleX="1.5"
+            android:padding="2dp"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

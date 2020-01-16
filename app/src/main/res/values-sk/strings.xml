@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Balancer</string>
+    <string name="add_category">PRIDAŤ KATEGÓRIU</string>
+    <string name="add_payment">PRIDAŤ PLATBU</string>
+    <string name="cat_exists">Už existuje</string>
+    <string name="category_name">Názov kategórie</string>
+    <string name="change_category">ZMENIŤ KATEGÓRIU</string>
+    <string name="delete_msg_rlly">Naozaj chcete vymazať</string>
+    <string name="delete_payment">VYMAZAŤ PLATBU</string>
+    <string name="description_optional">Popis (voliteľný)</string>
+    <string name="err_wrong_item_name">Názov platby nesmie obsahovať špeciálne znaky</string>
+    <string name="filter">FILTER</string>
+    <string name="find">Hľadať</string>
+    <string name="from">OD</string>
+    <string name="illegal_chars">Nepovolené znaky</string>
+    <string name="item_name">Názov</string>
+    <string name="max">MAX</string>
+    <string name="min">MIN</string>
+    <string name="price">Cena</string>
+    <string name="selected_payments">vybraných platieb?</string>
+    <string name="to">DO</string>
+    <string name="edit_payment">UPRAVIŤ PLATBU</string>
+    <string name="category">KAT...</string>
+    <string name="selected">Vybrané</string>
+</resources>

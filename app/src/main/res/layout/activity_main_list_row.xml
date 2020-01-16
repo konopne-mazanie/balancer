@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="viewmodel"
+            type="com.uhreckysw.balancer.ui.main_activity.PaymentUIElem" />
+    </data>
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/rootView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    >
+    <androidx.constraintlayout.widget.ConstraintLayout
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        android:id="@+id/coloredView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:orientation="horizontal"
+        android:background="@{viewmodel.checked ? @color/colorSelection : @android:color/transparent}"
+        >
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        app:layout_constraintBottom_toBottomOf="@id/item_bottom_caption"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/item_left_caption"
+
+        android:id="@+id/check_select_item"
+        style="@style/MyBigCheckBox"
+        android:paddingRight="10dp"
+        android:visibility="gone"
+        android:checked="@={viewmodel.checked}"
+        />
+
+    <TextView
+        app:layout_constraintStart_toEndOf="@id/check_select_item"
+        app:layout_constraintTop_toTopOf="parent"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:id="@+id/item_left_caption"
+        android:text="@{viewmodel.item}"
+        android:textSize="20sp" />
+    <TextView
+        app:layout_constraintStart_toEndOf="@id/check_select_item"
+        app:layout_constraintTop_toBottomOf="@id/item_left_caption"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:id="@+id/item_bottom_caption"
+        android:text="@{viewmodel.bottom_caption}"
+        android:textSize="15sp" />
+    <TextView
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:id="@+id/item_right_caption"
+        android:textSize="30sp"
+        android:text="@{viewmodel.price}"
+        />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/item_bottom_caption"
+        android:layout_marginTop="6dp"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/description_area"
+        android:visibility="@{viewmodel.unpacked ? View.VISIBLE : View.GONE}"
+        >
+
+        <TextView
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+
+            android:paddingEnd="60dp"
+            android:textAlignment="viewStart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:id="@+id/item_description"
+            android:text="@{viewmodel.description}"
+            android:textSize="15sp" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/copy_button"
+            android:src="@drawable/imagebutton_selector_copy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:scaleY="1.2"
+            android:scaleX="1.2"
+            android:padding="2dp"
+            android:layout_marginEnd="5dp"
+
+            app:layout_constraintEnd_toStartOf="@id/edit_button"
+            app:layout_constraintTop_toTopOf="parent" />
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/edit_button"
+            android:src="@drawable/imagebutton_selector_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:scaleY="1.5"
+            android:scaleX="1.5"
+            android:padding="2dp"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
