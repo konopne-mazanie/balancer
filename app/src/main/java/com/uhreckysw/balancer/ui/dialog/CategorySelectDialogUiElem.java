@@ -2,7 +2,8 @@ package com.uhreckysw.balancer.ui.dialog;
 
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
-import androidx.databinding.library.baseAdapters.BR;
+
+import com.uhreckysw.balancer.BR;
 
 public class CategorySelectDialogUiElem extends BaseObservable {
     private final String name;

@@ -6,11 +6,12 @@ import android.text.TextWatcher;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.databinding.Bindable;
 import androidx.databinding.DataBindingUtil;
-import androidx.databinding.library.baseAdapters.BR;
 
+import com.uhreckysw.balancer.BR;
 import com.uhreckysw.balancer.R;
 import com.uhreckysw.balancer.backend.DateCommon;
 import com.uhreckysw.balancer.backend.db.Payment;
@@ -67,7 +68,7 @@ public class AddPaymentDialog extends MyDialog implements ICategoryDialog {
             @Override
             public void afterTextChanged(Editable s) {
                 final Activity par = parentActivity;
-                if (!Pattern.compile("^[\\w|\\s]*$").matcher(itemNameField.getText()).find())
+                if (!Pattern.compile("^[\\w\\s()-]*$").matcher(itemNameField.getText()).find())
                     itemNameField.setError(parentActivity.getString(R.string.err_wrong_item_name));
             }
         };
@@ -79,16 +80,21 @@ public class AddPaymentDialog extends MyDialog implements ICategoryDialog {
     void update() {
         categoryDataAdapter.clear();
         categoryDataAdapter.addAll(db.getAllCategories());
+        categoryDataAdapter.notifyDataSetChanged();
+        if (categoryDataAdapter.getCount() == 0) categoryDataAdapter.add("");
+        categoryList.setSelection(0);
         itemNameField.setText("");
         setItemPriceFieldText("");
         setItemDateFieldText(DateCommon.dateFormatGUI.format(new Date()));
         setItemDescriptionFieldText("");
+        resetValidation();
     }
 
     @Override
     public void setCategory(String category) {
         categoryDataAdapter.clear();
         categoryDataAdapter.addAll(db.getAllCategories());
+        categoryDataAdapter.notifyDataSetChanged();
         categoryList.setSelection(categoryDataAdapter.getPosition(category));
     }
 
@@ -105,20 +111,38 @@ public class AddPaymentDialog extends MyDialog implements ICategoryDialog {
         dialog.cancel();
     }
 
+    String validator(boolean cond, boolean[] error) {
+        if (cond) {
+            error[0] = true;
+            return parentActivity.getString(R.string.required_field);
+        }
+        return null;
+    }
+    boolean validate() {
+        boolean[] error = {false};
+        itemNameField.setError(validator(itemNameField.getText().toString().isEmpty(), error));
+        ((EditText) dialogLayout.findViewById(R.id.item_payed_date)).setError(validator(getItemDateFieldText().isEmpty(), error));
+        ((EditText) dialogLayout.findViewById(R.id.item_price)).setError(validator(getItemPriceFieldText().isEmpty(), error));
+        ((TextView) categoryList.getSelectedView()).setError(validator(categoryList.getSelectedItem().toString().isEmpty(), error));
+        return (!error[0] && (itemNameField.getError() == null));
+    }
+    void resetValidation() {
+        itemNameField.setError(null);
+        ((EditText) dialogLayout.findViewById(R.id.item_payed_date)).setError(null);
+        ((EditText) dialogLayout.findViewById(R.id.item_price)).setError(null);
+    }
+
     public void onConfirm() {
-        if ((!itemNameField.getText().toString().isEmpty()) &&
-                (!getItemDateFieldText().isEmpty()) &&
-                (!getItemPriceFieldText().isEmpty()) &&
-                (itemNameField.getError() == null)) {
+        if (validate()) {
             try {
                 db.createPayment(new Payment()
                         .setItem(itemNameField.getText().toString())
                         .setDate_of_buy(DateCommon.parseDateGUI(getItemDateFieldText()))
                         .setPrice(((float) Math.round(Float.parseFloat(getItemPriceFieldText().replace(",", ".")) * 100)) / 100)
-                        .setId(0)
                         .setDescription(getItemDescriptionFieldText())
                         .setCategory(categoryList.getSelectedItem().toString()));
             } catch (Exception e) {
+                ((EditText) dialogLayout.findViewById(R.id.item_payed_date)).setError(parentActivity.getString(R.string.required_field));
                 return;
             }
             parent.update();

@@ -13,10 +13,10 @@ import com.uhreckysw.balancer.ui.interfaces.ICategoryDialog;
 import com.uhreckysw.balancer.ui.interfaces.IUpdatable;
 import com.uhreckysw.balancer.ui.main_activity.PaymentUIElem;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public final class ChangeCategoryDialog extends MyDialog implements ICategoryDialog {
-    private ArrayList<PaymentUIElem> items;
+    private List<PaymentUIElem> items;
     final private Spinner categoryList;
     final private ArrayAdapter<String> categoryDataAdapter;
     private AddCategoryDialog addCategoryDialog;
@@ -27,7 +27,7 @@ public final class ChangeCategoryDialog extends MyDialog implements ICategoryDia
         dialogLayout = binding.getRoot();
     }
 
-    public ChangeCategoryDialog(Activity parentActivity, IUpdatable parent, ArrayList<PaymentUIElem> items) {
+    public ChangeCategoryDialog(Activity parentActivity, IUpdatable parent, List<PaymentUIElem> items) {
         super(parentActivity, parent);
 
         this.items = items;
@@ -49,6 +49,7 @@ public final class ChangeCategoryDialog extends MyDialog implements ICategoryDia
     public void setCategory(String category) {
         categoryDataAdapter.clear();
         categoryDataAdapter.addAll(db.getAllCategories());
+        categoryDataAdapter.notifyDataSetChanged();
         categoryList.setSelection(categoryDataAdapter.getPosition(category));
     }
 

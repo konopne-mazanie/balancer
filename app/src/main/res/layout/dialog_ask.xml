@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/dialog_bg"
     >
     <data>
         <import type="android.view.View"/>
         <variable
             name="viewmodel"
-            type="com.uhreckysw.balancer.ui.dialog.DeleteItemDialog" />
+            type="com.uhreckysw.balancer.ui.dialog.AskDialog" />
     </data>
 <ScrollView
     android:layout_width="match_parent"
@@ -27,7 +27,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
 
-        android:text="@string/delete_payment"
+        android:text="@{viewmodel.dialogTitle}"
         android:id="@+id/dialog_title"
         style="@style/MyDialogTitle"
         />

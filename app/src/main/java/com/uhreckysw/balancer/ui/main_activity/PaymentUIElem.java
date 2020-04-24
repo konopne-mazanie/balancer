@@ -2,8 +2,8 @@ package com.uhreckysw.balancer.ui.main_activity;
 
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
-import androidx.databinding.library.baseAdapters.BR;
 
+import com.uhreckysw.balancer.BR;
 import com.uhreckysw.balancer.backend.DateCommon;
 import com.uhreckysw.balancer.backend.db.Payment;
 import com.uhreckysw.balancer.ui.interfaces.LambdaVoidInt;

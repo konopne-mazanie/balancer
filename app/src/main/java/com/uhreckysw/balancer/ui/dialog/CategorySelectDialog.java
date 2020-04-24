@@ -3,11 +3,11 @@ package com.uhreckysw.balancer.ui.dialog;
 import android.app.Activity;
 import android.view.View;
 
-import com.uhreckysw.balancer.R;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.uhreckysw.balancer.R;
 import com.uhreckysw.balancer.databinding.DialogFilterCategorySelectBinding;
 import com.uhreckysw.balancer.ui.interfaces.IFiltersDialog;
 import com.uhreckysw.balancer.ui.interfaces.IUpdatable;
@@ -62,15 +62,15 @@ public class CategorySelectDialog extends MyDialog implements ItemClickListener 
         List<String> currentCategory = Arrays.asList(filtersDialog.getCategory().replace("'", "")
                                                                         .replace(" ", "")
                                                                         .split(","));
-        categorySelectDialogListViewAdapter.clear();
+        categorySelectDialogListViewAdapter.mData.clear();
         for (String category : currentCategory) {
             if (category.isEmpty()) continue;
             CategorySelectDialogUiElem newElem = new CategorySelectDialogUiElem(category);
-            categorySelectDialogListViewAdapter.add(newElem);
+            categorySelectDialogListViewAdapter.mData.add(newElem);
             newElem.setChecked(true);
         }
         for (String category : db.getAllCategories()) {
-            if (!currentCategory.contains(category)) categorySelectDialogListViewAdapter.add(new CategorySelectDialogUiElem(category));
+            if (!currentCategory.contains(category)) categorySelectDialogListViewAdapter.mData.add(new CategorySelectDialogUiElem(category));
         }
         categorySelectDialogListViewAdapter.notifyDataSetChanged();
     }

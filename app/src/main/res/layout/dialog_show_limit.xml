@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/dialog_bg">
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="viewmodel"
+            type="com.uhreckysw.balancer.ui.dialog.ShowLimitDialog" />
+    </data>
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="4dp"
+    >
+
+    <FrameLayout
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/proggress"
+        >
+    <ProgressBar
+        android:id="@+id/progressbar"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="false"
+        android:indeterminate="false"
+        android:progress="@{viewmodel.item.proggress}"
+        android:gravity="center"
+
+        android:progressDrawable="@drawable/proggress_bar"
+        />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:gravity="right"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="25dp"
+            android:paddingBottom="10dp"
+            android:paddingEnd="10dp"
+
+            android:text="@{viewmodel.item.sum}"
+            android:textSize="40dp"
+            android:id="@+id/proggress_caption"
+            android:textStyle="bold"
+            android:textColor="@{(Float.parseFloat(viewmodel.item.sum.replace(',', '.')) &lt; 0) ? @android:color/holo_red_dark : @android:color/black}"
+            />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="27dp"
+            android:padding="5dp"
+
+            android:text="@{viewmodel.item.name}"
+            android:textSize="12dp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:background="@color/colorPrimaryDark"
+            />
+    </FrameLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/proggress"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+
+        android:id="@+id/view_details"
+        >
+    <androidx.constraintlayout.widget.ConstraintLayout
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+
+        android:id="@+id/view_spent"
+        >
+        <androidx.appcompat.widget.AppCompatTextView
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+
+            android:text="@string/spent"
+            android:textSize="20dp"
+            android:textColor="@color/colorPrimary"
+            />
+        <androidx.appcompat.widget.AppCompatTextView
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+
+            android:text="@{String.format(`%.02f`, viewmodel.item.limit.spent)}"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/view_spent"
+
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+
+            android:id="@+id/view_limit"
+            >
+            <androidx.appcompat.widget.AppCompatTextView
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+
+                android:text="@string/limit"
+                android:textAllCaps="true"
+                android:textSize="20dp"
+                android:textColor="@color/colorPrimary"
+                />
+            <androidx.appcompat.widget.AppCompatTextView
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+
+                android:text="@{String.format(`%.02f`, viewmodel.item.limit.value)}"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/view_limit"
+
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+
+            android:id="@+id/view_days"
+            >
+            <androidx.appcompat.widget.AppCompatTextView
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+
+                android:text="@string/duration_days"
+                android:textAllCaps="true"
+                android:textSize="20dp"
+                android:textColor="@color/colorPrimary"
+                />
+            <androidx.appcompat.widget.AppCompatTextView
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+
+                android:text="@{String.format(`%d`,viewmodel.item.limit.days)}"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/view_days"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+
+            android:id="@+id/view_categories"
+            >
+            <androidx.appcompat.widget.AppCompatTextView
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+
+                android:text="@string/categories"
+                android:textSize="20dp"
+                android:textColor="@color/colorPrimary"
+                android:id="@+id/categories_caption"
+                />
+            <androidx.appcompat.widget.AppCompatTextView
+                app:layout_constraintTop_toTopOf="@id/categories_caption"
+                app:layout_constraintBottom_toBottomOf="@id/categories_caption"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/categories_caption"
+
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_marginStart="15dp"
+
+                android:text="@{viewmodel.item.limit.category.replace(`'`,``)}"
+                android:textSize="15dp"
+                android:textColor="#000000"
+                android:textAlignment="viewEnd"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.appcompat.widget.AppCompatButton
+        app:layout_constraintTop_toBottomOf="@id/view_details"
+        app:layout_constraintStart_toStartOf="parent"
+
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:id="@+id/limit_warn"
+        android:background="#F5F5F5"
+        android:text="@string/show_payments"
+        android:textAlignment="textStart"
+        android:drawableStart="@drawable/ic_filter_purple"
+        android:drawableEnd="@drawable/ic_right_black"
+        android:drawablePadding="5dp"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="15dp"
+
+        android:onClick="@{(view)->viewmodel.onConfirm()}"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
+</layout>

@@ -9,10 +9,12 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.uhreckysw.balancer.R;
+import com.uhreckysw.balancer.databinding.DialogFilterCategorySelectListRowBinding;
 import com.uhreckysw.balancer.ui.interfaces.ItemClickListener;
+
 import java.util.List;
 
-public class CategorySelectDialogListViewAdapter extends RecyclerView.Adapter<CategorySelectDialogListViewHolder> {
+public class CategorySelectDialogListViewAdapter extends RecyclerView.Adapter<CategorySelectDialogListViewAdapter.CategorySelectDialogListViewHolder> {
 
     public List<CategorySelectDialogUiElem> mData;
     public LayoutInflater mInflater;
@@ -35,9 +37,6 @@ public class CategorySelectDialogListViewAdapter extends RecyclerView.Adapter<Ca
         holder.binding.executePendingBindings();
     }
 
-    void clear() {mData.clear();}
-    void add(CategorySelectDialogUiElem elem) {mData.add(elem);}
-
     @Override
     public int getItemCount() {
         return mData.size();
@@ -47,4 +46,21 @@ public class CategorySelectDialogListViewAdapter extends RecyclerView.Adapter<Ca
         this.mClickListener = itemClickListener;
     }
 
+    public static class CategorySelectDialogListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        public DialogFilterCategorySelectListRowBinding binding;
+        private CategorySelectDialogListViewAdapter categorySelectDialogListViewAdapter;
+
+        CategorySelectDialogListViewHolder(CategorySelectDialogListViewAdapter categorySelectDialogListViewAdapter, View itemView, DialogFilterCategorySelectListRowBinding binding) {
+            super(itemView);
+            this.categorySelectDialogListViewAdapter = categorySelectDialogListViewAdapter;
+            this.binding = binding;
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            if (categorySelectDialogListViewAdapter.mClickListener != null) categorySelectDialogListViewAdapter.mClickListener.onItemClick(view, getAdapterPosition());
+        }
+
+    }
 }

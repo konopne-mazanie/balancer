@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    >
+    android:background="@drawable/dialog_bg">
     <data>
         <import type="android.view.View"/>
         <variable
@@ -24,7 +23,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
 
-        android:text="ADD LIMIT"
+        android:text="@string/add_limit"
         android:id="@+id/dialog_title"
         style="@style/MyDialogTitle"
         />
@@ -46,7 +45,7 @@
         android:layout_marginTop="8dp"
 
         android:id="@+id/item_value"
-        android:hint="Limit"
+        android:hint="@string/limit"
         android:inputType="numberDecimal"
         style="@style/MyTextField"
         android:text="@={viewmodel.itemValue}"
@@ -59,7 +58,7 @@
         android:layout_marginTop="8dp"
 
         android:id="@+id/item_days"
-        android:hint="Duration (days)"
+        android:hint="@string/duration_days"
         android:inputType="number"
         style="@style/MyTextField"
         android:text="@={viewmodel.itemDays}"

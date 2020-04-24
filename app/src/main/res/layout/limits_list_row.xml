@@ -1,27 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    >
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <import type="android.view.View"/>
         <variable
             name="viewmodel"
             type="com.uhreckysw.balancer.ui.main_activity.LimitUIElem" />
     </data>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ProgressBar
+            android:id="@+id/progressbar"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusable="false"
+            android:indeterminate="false"
+            android:progress="@{viewmodel.proggress}"
+            android:gravity="center"
+
+            android:progressDrawable="@drawable/proggress_bar"
+            />
 <androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="10dp"
+    android:gravity="center"
     >
 
     <TextView
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/item_right_caption"
-        app:layout_constraintBottom_toBottomOf="@id/item_right_caption"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/item_right_caption"
 
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -29,26 +42,31 @@
         android:textAlignment="viewStart"
         android:id="@+id/item_left_caption"
         android:text="@{viewmodel.name}"
-        android:textSize="18sp" />
+        android:textSize="20sp" />
     <TextView
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/options"
+        app:layout_constraintTop_toTopOf="@id/options"
+        app:layout_constraintBottom_toBottomOf="@id/options"
 
+        android:layout_marginEnd="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
         android:id="@+id/item_right_caption"
         android:textSize="25sp"
         android:text="@{viewmodel.sum}"
+        android:textColor="@{(Float.parseFloat(viewmodel.sum.replace(',', '.')) &lt; 0) ? @android:color/holo_red_dark : @android:color/tab_indicator_text}"
         />
     <TextView
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/item_right_caption"
-        app:layout_constraintEnd_toStartOf="@id/description_area"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/item_right_caption"
+        app:layout_constraintTop_toBottomOf="@id/item_left_caption"
 
+        android:textAlignment="viewStart"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
+        android:layout_marginTop="0dp"
         android:layout_marginEnd="10dp"
 
         android:id="@+id/item_bottom_caption"
@@ -57,16 +75,13 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/item_right_caption"
-        android:layout_marginTop="3dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="0dp"
 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/description_area"
-        android:visibility="@{viewmodel.unpacked ? View.VISIBLE : View.GONE}"
+        android:id="@+id/options"
         >
-
-
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/delete_button"
@@ -79,8 +94,8 @@
             android:padding="2dp"
             android:layout_marginEnd="5dp"
 
-            app:layout_constraintEnd_toStartOf="@id/edit_button"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edit_button" />
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/edit_button"
             android:src="@drawable/imagebutton_selector_edit"
@@ -96,4 +111,5 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 </layout>

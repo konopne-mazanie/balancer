@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Balancer</string>
-    <string name="action_settings" translatable="false">Settings</string>
     <string name="add_payment">ADD PAYMENT</string>
     <string name="price">Price</string>
     <string name="item_name">Name</string>
@@ -12,6 +11,7 @@
     <string name="max">MAX</string>
     <string name="find">Find</string>
     <string name="delete_payment">DELETE PAYMENT</string>
+    <string name="delete_limit">DELETE LIMIT</string>
     <string name="err_wrong_item_name">Item\'s name should not contain special characters</string>
     <string name="category_name">Category\'s Name</string>
     <string name="add_category">ADD CATEGORY</string>
@@ -19,8 +19,23 @@
     <string name="illegal_chars">Illegal Characters</string>
     <string name="description_optional">Description (optional)</string>
     <string name="delete_msg_rlly">Do you really want to delete</string>
-    <string name="selected_payments">selected payments?</string>
+    <string name="selected_payments">selected items?</string>
     <string name="edit_payment">EDIT PAYMENT</string>
+    <string name="edit_limit">EDIT LIMIT</string>
     <string name="category">CAT...</string>
     <string name="selected">Selected</string>
+    <string name="days">DAYS</string>
+    <string name="required_field">required</string>
+    <string name="limits_headline">Limits</string>
+    <string name="add_limit">ADD LIMIT</string>
+    <string name="limit">Limit</string>
+    <string name="duration_days">Duration (days)</string>
+    <string name="limit_exceeded">Limit exceeded</string>
+    <string name="spent">SPENT</string>
+    <string name="categories">CATEGORIES</string>
+    <string name="show_payments">SHOW PAYMENTS</string>
+    <string name="scan_headline">Scan Receipt QR Code</string>
+    <string name="camera_error">Camera error!</string>
+    <string name="internet_error">No internet connection!</string>
+    <string name="qr_format_error">Unknown QR Code format! Only receipts of the merchants registered in slovakian financial office are supported.</string>
 </resources>

@@ -45,7 +45,7 @@ public final class AddCategoryDialog extends MyDialog {
             @Override
             public void afterTextChanged(Editable s) {
                 final Activity par = parentActivity;
-                if (!Pattern.compile("^[\\w|\\s]*$").matcher(categoryName.getText()).find())
+                if (!Pattern.compile("^[\\w\\s()-]*$").matcher(categoryName.getText()).find())
                     categoryName.setError(parentActivity.getString(R.string.err_wrong_item_name));
             }
         };

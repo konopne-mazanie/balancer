@@ -2,27 +2,23 @@ package com.uhreckysw.balancer.ui.dialog;
 
 import android.app.Activity;
 import android.util.Pair;
-import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.SeekBar;
-import android.widget.Spinner;
 
 import androidx.databinding.Bindable;
 import androidx.databinding.DataBindingUtil;
-import androidx.databinding.library.baseAdapters.BR;
 
+import com.uhreckysw.balancer.BR;
 import com.uhreckysw.balancer.R;
 import com.uhreckysw.balancer.backend.DateCommon;
 import com.uhreckysw.balancer.backend.db.Filter;
 import com.uhreckysw.balancer.databinding.DialogFilterBinding;
-import com.uhreckysw.balancer.ui.MyArrayAdapter;
 import com.uhreckysw.balancer.ui.interfaces.IFiltersDialog;
 import com.uhreckysw.balancer.ui.interfaces.IUpdatable;
 
 import org.joda.time.DateTimeComparator;
 
-import java.lang.ref.WeakReference;
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -69,23 +65,18 @@ public final class FiltersDialog extends MyDialog implements IFiltersDialog {
     }
 
     public Filter defaultFilter() {
-        if (db.paymentsEmpty()) return new Filter().makeDefault();
-        
-        Pair<Date, Date> dateBoundaries;
-        try {
-            dateBoundaries = db.getDateBoundaries();
-        } catch (ParseException e) {
-            dateBoundaries = new Pair<>(new Date(), new Date());
-        }
-        Pair<Float, Float> priceBoundaries = db.getPriceBoundaries(dateBoundaries.first, dateBoundaries.second, "");
+        if (db.isEmptyDb()) return new Filter().makeDefault();
+
+        Date currrentDate = new Date();
         Calendar calendar = new GregorianCalendar();
-        calendar.setTime(new Date());
-        calendar.add(Calendar.DATE, -31);
+        calendar.setTime(currrentDate);
+        calendar.add(Calendar.DATE, -30);
+        Pair<Float, Float> priceBoundaries = db.getPriceBoundaries(calendar.getTime(), currrentDate, "");
        return new Filter()
                 .setPriceMin(priceBoundaries.first)
                 .setPriceMax(priceBoundaries.second)
                 .setDateMin(calendar.getTime())
-                .setDateMax(dateBoundaries.second)
+                .setDateMax(currrentDate)
                 .makeDefault();
     }
 
@@ -95,6 +86,8 @@ public final class FiltersDialog extends MyDialog implements IFiltersDialog {
         maxSeek.setMax((int) (defaultFilter.priceMax*100));
         minSeek.setMax((int) (defaultFilter.priceMax*100));
         setFilter(defaultFilter);
+        ((EditText) dialogLayout.findViewById(R.id.value_date_min)).setError(null);
+        ((EditText) dialogLayout.findViewById(R.id.value_date_max)).setError(null);
     }
 
     public void onCancel() {
@@ -102,11 +95,21 @@ public final class FiltersDialog extends MyDialog implements IFiltersDialog {
     }
 
     public void onConfirm() {
+        Date parsedDateMin = DateCommon.parseDateGUI(getDateMin());
+        Date parsedDateMax = DateCommon.parseDateGUI(getDateMax());
+        if (parsedDateMin == null) {
+            ((EditText) dialogLayout.findViewById(R.id.value_date_min)).setError(parentActivity.getString(R.string.required_field));
+            return;
+        }
+        if (parsedDateMax == null) {
+            ((EditText) dialogLayout.findViewById(R.id.value_date_max)).setError(parentActivity.getString(R.string.required_field));
+            return;
+        }
         Filter f = new Filter()
                 .setPriceMin(priceMin)
                 .setPriceMax(priceMax)
-                .setDateMin(DateCommon.parseDateGUI(getDateMin()))
-                .setDateMax(DateCommon.parseDateGUI(getDateMax()))
+                .setDateMin(parsedDateMin)
+                .setDateMax(parsedDateMax)
                 .setCategory(getCategory());
         Filter defaultFilter = defaultFilter();
         if (        defaultFilter.category.equals(f.category)

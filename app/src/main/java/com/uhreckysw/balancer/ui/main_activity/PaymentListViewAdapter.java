@@ -4,16 +4,18 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.uhreckysw.balancer.R;
+import com.uhreckysw.balancer.databinding.ActivityMainListRowBinding;
 import com.uhreckysw.balancer.ui.interfaces.ItemClickListener;
 
 import java.util.List;
 
-public class PaymentListViewAdapter extends RecyclerView.Adapter<PaymentListViewHolder> {
+public class PaymentListViewAdapter extends RecyclerView.Adapter<PaymentListViewAdapter.PaymentListViewHolder> {
 
     public List<PaymentUIElem> mData;
     public LayoutInflater mInflater;
@@ -44,12 +46,41 @@ public class PaymentListViewAdapter extends RecyclerView.Adapter<PaymentListView
         return mData.size();
     }
 
-    PaymentUIElem getItem(int id) {return mData.get(id);}
-    void clear() {mData.clear();}
-    void add(PaymentUIElem elem) {mData.add(elem);}
-
     void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
     }
 
+    public static class PaymentListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+        private PaymentListViewAdapter paymentListViewAdapter;
+        public ActivityMainListRowBinding binding;
+
+        PaymentListViewHolder(PaymentListViewAdapter paymentListViewAdapter, View itemView, ActivityMainListRowBinding binding) {
+            super(itemView);
+            this.paymentListViewAdapter = paymentListViewAdapter;
+            this.binding = binding;
+            ImageButton edit_button = itemView.findViewById(R.id.edit_button);
+            edit_button.setOnClickListener(view -> {
+                if (paymentListViewAdapter.mClickListener != null) paymentListViewAdapter.mClickListener.onSettingsButtonClick(view, getAdapterPosition());
+            });
+            ImageButton copy_button = itemView.findViewById(R.id.copy_button);
+            copy_button.setOnClickListener(view -> {
+                if (paymentListViewAdapter.mClickListener != null) paymentListViewAdapter.mClickListener.onCopyButtonClick(view, getAdapterPosition());
+            });
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            if (paymentListViewAdapter.mClickListener != null) paymentListViewAdapter.mClickListener.onItemClick(view, getAdapterPosition());
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            if (paymentListViewAdapter.mClickListener != null) paymentListViewAdapter.mClickListener.onItemLongClick(view, getAdapterPosition());
+            else return false;
+            return true;
+        }
+
+    }
 }

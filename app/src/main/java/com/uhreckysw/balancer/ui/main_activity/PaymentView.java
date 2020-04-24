@@ -1,31 +1,28 @@
 package com.uhreckysw.balancer.ui.main_activity;
 
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProviders;
-
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.uhreckysw.balancer.R;
 import com.uhreckysw.balancer.backend.DateCommon;
 import com.uhreckysw.balancer.backend.db.Database;
 import com.uhreckysw.balancer.backend.db.Filter;
-import com.uhreckysw.balancer.backend.db.Payment;
 import com.uhreckysw.balancer.databinding.PaymentViewBinding;
 import com.uhreckysw.balancer.ui.dialog.AddPaymentDialog;
 import com.uhreckysw.balancer.ui.dialog.ChangeCategoryDialog;
@@ -35,18 +32,16 @@ import com.uhreckysw.balancer.ui.dialog.FiltersDialog;
 import com.uhreckysw.balancer.ui.interfaces.IUpdatable;
 import com.uhreckysw.balancer.ui.interfaces.ItemClickListener;
 import com.uhreckysw.balancer.ui.interfaces.LambdaVoidInt;
+import com.uhreckysw.balancer.ui.scan_activity.ScanActivity;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.regex.Pattern;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 public class PaymentView extends Fragment implements ItemClickListener, IUpdatable {
-
-
-    public static PaymentView newInstance() {
-        return new PaymentView();
-    }
-
     Database db;
     String nameFilter = "";
     Filter filter;
@@ -92,7 +87,6 @@ public class PaymentView extends Fragment implements ItemClickListener, IUpdatab
         paymentListView.setAdapter(paymentListViewAdapter);
 
         sumCaption = view.findViewById(R.id.prices_sum_caption);
-        PaymentView thisView = this;
         TextWatcher afterTextChangedListener = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -106,12 +100,8 @@ public class PaymentView extends Fragment implements ItemClickListener, IUpdatab
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (!Pattern.compile("^[\\w|\\s]*$").matcher(findField.getText()).find())
-                    findField.setError(parentActivity.getString(R.string.illegal_chars), null);
-                else {
-                    thisView.nameFilter = findField.getText().toString();
-                    update();
-                }
+                PaymentView.this.nameFilter = findField.getText().toString();
+                update();
                 if (findField.getText().toString().isEmpty()) binding.setIsSearching(false);
                 else binding.setIsSearching(true);
             }
@@ -126,20 +116,28 @@ public class PaymentView extends Fragment implements ItemClickListener, IUpdatab
 
     @Override
     public void update() {
-        view.setEnabled(false);
-        if (filter.isDefault) filter = filtersDialog.defaultFilter(); //update default filter
-        cancelUnpacked();
-        paymentListViewAdapter.clear();
+        update(null);
+    }
+    public void update(AtomicBoolean finished) {
+        if (view == null) return;
+        new Thread(() -> {
+            parentActivity.runOnUiThread(() -> view.setEnabled(false));
 
-        for (Payment payment : db.filterPayment(filter, findField.getText().toString())) paymentListViewAdapter.add(new PaymentUIElem(payment, increaseSelectedCntFn));
+            if (filter.isDefault) filter = filtersDialog.defaultFilter(); //update default filter
 
-        paymentListViewAdapter.notifyDataSetChanged();
+            paymentListViewAdapter.mData = db.filterPayment(filter, findField.getText().toString()).stream().map((payment) -> new PaymentUIElem(payment, increaseSelectedCntFn)).collect(Collectors.toList());
+            final double sum = paymentListViewAdapter.mData.stream().mapToDouble(p -> p.payment.price).reduce(0, Double::sum);
+            binding.setLimitWarnOn(db.getAllLimits().stream().anyMatch(l -> l.spent > l.value));
 
-        float sum = 0;
-        for (int i = 0; i < paymentListViewAdapter.getItemCount(); i++) sum+= paymentListViewAdapter.getItem(i).payment.price;
-        sumCaption.setText("\u03A3 " + String.format("%.02f", sum));
-        paymentListView.smoothScrollToPosition(0);
-        view.setEnabled(true);
+            parentActivity.runOnUiThread(() -> {
+                cancelUnpacked();
+                sumCaption.setText("\u03A3 " + String.format("%.02f", sum));
+                paymentListViewAdapter.notifyDataSetChanged();
+                paymentListView.smoothScrollToPosition(0);
+                view.setEnabled(true);
+            });
+            if (finished != null) finished.set(true);
+        }).start();
     }
 
     @Override
@@ -160,20 +158,19 @@ public class PaymentView extends Fragment implements ItemClickListener, IUpdatab
     public void onItemLongClick(View view, int position) {
         if (selectionMode) return;
         switchSelection();
-        PaymentUIElem elem = paymentListViewAdapter.mData.get(position);
-        elem.setChecked(true);
+        paymentListViewAdapter.mData.get(position).setChecked(true);
     }
 
     @Override
     public void onSettingsButtonClick(View view, int position) {
-        editPaymentDialog.setClickedItem(paymentListViewAdapter.getItem(position));
         editPaymentDialog.show();
+        editPaymentDialog.setClickedItem(paymentListViewAdapter.mData.get(position));
     }
 
     @Override
     public void onCopyButtonClick(View view, int position) {
         addPaymentDialog.show();
-        addPaymentDialog.setClickedItem(paymentListViewAdapter.getItem(position));
+        addPaymentDialog.setClickedItem(paymentListViewAdapter.mData.get(position));
         addPaymentDialog.setItemDateFieldText(DateCommon.dateFormatGUI.format(new Date()));
     }
 
@@ -195,22 +192,30 @@ public class PaymentView extends Fragment implements ItemClickListener, IUpdatab
         for (PaymentUIElem elem : paymentListViewAdapter.mData) elem.setUnpacked(false);
     }
 
-    ArrayList<PaymentUIElem> getChecked() {
-        ArrayList<PaymentUIElem> ret = new ArrayList<>();
-        for (PaymentUIElem elem : paymentListViewAdapter.mData) {
-            if (elem.getChecked()) ret.add(elem);
-        }
-        return ret;
+    List<PaymentUIElem> getChecked() {
+        return paymentListViewAdapter.mData.stream().filter(PaymentUIElem::getChecked).collect(Collectors.toList());
     }
 
     // ### OnButtonClick ###
+    public void onSwitchLimis() {
+        ((MainActivity) parentActivity).mPager.setCurrentItem(1, true);
+    }
+
     public void onClearSearch() {
         findField.setText("");
-        findField.setError(null);
+        try {
+            ((InputMethodManager) parentActivity.getSystemService(Activity.INPUT_METHOD_SERVICE)).
+                    hideSoftInputFromWindow(Optional.ofNullable(parentActivity.getCurrentFocus()).
+                            orElse(new View(parentActivity)).getWindowToken(), 0);
+        } catch (Exception e) {}
     }
 
     public void onAddItem() {
         addPaymentDialog.show();
+    }
+
+    public void onScanItem() {
+        startActivityForResult(new Intent(parentActivity, ScanActivity.class), 1);
     }
 
     public void onInvokeFilters() {
@@ -220,17 +225,16 @@ public class PaymentView extends Fragment implements ItemClickListener, IUpdatab
     }
 
     public void onChangeCategory() {
-        ArrayList<PaymentUIElem> checked = getChecked();
+        List<PaymentUIElem> checked = getChecked();
         if (checked.isEmpty()) return;
         ChangeCategoryDialog changeCategoryDialog = new ChangeCategoryDialog(parentActivity, this, checked);
         changeCategoryDialog.show();
+        if (checked.size() == 1) changeCategoryDialog.setCategory(checked.get(0).payment.category);
     }
 
     public void onDeleteItem() {
-        ArrayList<PaymentUIElem> checked = getChecked();
-        if (checked.isEmpty()) return;
-        DeleteItemDialog deleteItemDialog = new DeleteItemDialog(parentActivity, this, checked);
-        deleteItemDialog.show();
+        List<PaymentUIElem> checked = getChecked();
+        if (!checked.isEmpty()) new DeleteItemDialog(parentActivity, this, checked).show();
     }
 
     public void onCancelSelection() {
@@ -239,6 +243,27 @@ public class PaymentView extends Fragment implements ItemClickListener, IUpdatab
 
     public void onSelectAll() {
         for (PaymentUIElem elem : paymentListViewAdapter.mData) elem.setChecked(true);
+    }
+
+    // ###########################################################################################
+    // Callbacks
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if ((requestCode == 1) && (data != null)) {
+            findField.setText(data.getStringExtra("receiptId"));
+            AtomicBoolean updateFinished = new AtomicBoolean(false);
+            update(updateFinished);
+            new Thread(() -> {
+                while (!updateFinished.get()) {}
+                PaymentView.this.parentActivity.runOnUiThread(() -> {
+                    switchSelection();
+                    for (PaymentUIElem elem : paymentListViewAdapter.mData) elem.setChecked(true);
+                    new ChangeCategoryDialog(parentActivity, this, paymentListViewAdapter.mData).show();
+                });
+            }).start();
+        }
     }
 
 }

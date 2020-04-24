@@ -4,6 +4,7 @@ public class Limit {
     public int id;
     public String name;
     public float value;
+    public float spent;
     public int days;
     public String category;
 
@@ -19,6 +20,11 @@ public class Limit {
 
     public Limit setValue(float value) {
         this.value = value;
+        return this;
+    }
+
+    public Limit setSpent(float spent) {
+        this.spent = spent;
         return this;
     }
 
