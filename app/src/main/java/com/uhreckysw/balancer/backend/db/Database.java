@@ -1,6 +1,7 @@
 package com.uhreckysw.balancer.backend.db;
 
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Pair;
 
@@ -21,23 +22,54 @@ public class Database {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     private Database() {
+        // initialize
         db = SQLiteDatabase.openOrCreateDatabase(Balancer.getContext().getFilesDir().toString() + "/db.sqlite",null);
         db.execSQL("PRAGMA foreign_keys=ON;");
-        db.execSQL("create table if not exists categories(name varchar(30) not null, primary key (name));");
-        db.execSQL("create table if not exists payments(" +
-                "id integer PRIMARY key," +
-                "item varchar(30) not null," +
-                "price float not null," +
-                "description text," +
-                "date_of_buy date," +
-                "category varchar(30)," +
-                "FOREIGN key (category) REFERENCES categories(name));");
-        db.execSQL("create table if not exists limits(" +
-                "id integer PRIMARY key," +
-                "name varchar(30) not null," +
-                "value float not null," +
-                "days integer not null," +
-                "category varchar(100))");
+        db.execSQL("create table if not exists version(nr integer PRIMARY key);");
+        db.execSQL("replace into version(nr) values(0);");
+
+        // migrate
+        switch (getVersion()) {
+            case 0:
+                db.execSQL("create table if not exists categories(name varchar(30) not null, primary key (name));");
+                db.execSQL("create table if not exists payments(" +
+                        "id integer PRIMARY key," +
+                        "item varchar(30) not null," +
+                        "price float," +
+                        "description text," +
+                        "date_of_buy date," +
+                        "category varchar(30)," +
+                        "FOREIGN key (category) REFERENCES categories(name));");
+                db.execSQL("create table if not exists limits(" +
+                        "id integer PRIMARY key," +
+                        "name varchar(30) not null," +
+                        "value float," +
+                        "days integer," +
+                        "category varchar(100))");
+                db.execSQL("insert into version(nr) values(1);");
+            case 1:
+                db.execSQL("create table receipt(" +
+                        "id varchar(50) PRIMARY key," +
+                        "merchant varchar(50));");
+                db.execSQL("create table receiptItems(" +
+                        "receiptId varchar(50) PRIMARY key," +
+                        "name varchar(50) not null," +
+                        "price float," +
+                        "quantity integer," +
+                        "FOREIGN key (receiptId) REFERENCES receipt(id));");
+                db.execSQL("alter table payments add column receiptId varchar(50);");
+                db.execSQL("insert into version(nr) values(2);");
+            default:
+                ;
+        }
+    }
+
+    private int getVersion() {
+        Cursor res = db.rawQuery( "select max(nr) from version", null );
+        res.moveToFirst();
+        int ret = res.getInt(0);
+        res.close();
+        return ret;
     }
 
     public void createCategory(String name) {
@@ -140,12 +172,12 @@ public class Database {
     public boolean isEmptyDb() {
         Cursor res = db.rawQuery( "select count(id) from payments", null );
         res.moveToFirst();
-        boolean ret = (res.getCount() == 0) || (res.getInt(0) == 0);
+        boolean ret = (res.getInt(0) == 0);
         res.close();
         return ret;
     }
 
-    public void clearCategories() {
+    private void clearCategories() {
         db.execSQL("DELETE FROM categories WHERE name not in" +
                 "(SELECT category as name from payments GROUP BY category);", new Object[]{});
     }
