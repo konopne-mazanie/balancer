@@ -88,22 +88,18 @@ public class Database {
         return ret;
     }
 
-    public void createPayment(Payment payment) {
-        createPayment(payment.item, payment.price, payment.date_of_buy, payment.category, (payment.description == null ? "" : payment.description));
-    }
-
-    private void createPayment(String item, float price, Date date_of_buy, String category, String description) {
-        db.execSQL("insert into payments(item, price, date_of_buy, category, description) VALUES(?,?,?,?,?);",
-                new Object[]{item, price, dateFormat.format(date_of_buy), category, description});
+    public void createPayment(String item, float price, Date date_of_buy, String category, String description, String receiptId) {
+        db.execSQL("insert into payments(item, price, date_of_buy, category, description, receiptId) VALUES(?,?,?,?,?,?);",
+                new Object[]{item, price, dateFormat.format(date_of_buy), category, description, receiptId});
     }
 
     public void editPayment(Payment payment) {
-        editPayment(payment.id, payment.item, payment.price, payment.date_of_buy, payment.category, (payment.description == null ? "" : payment.description));
+        editPayment(payment.id, payment.item, payment.price, payment.date_of_buy, payment.category, (payment.description == null ? "" : payment.description), (payment.receipt == null ? "" : payment.receipt.id));
     }
 
-    private void editPayment(int id, String item, float price, Date date_of_buy, String category, String description) {
-        db.execSQL("replace into payments(id, item, price, date_of_buy, category, description) VALUES(?,?,?,?,?,?);",
-                new Object[]{id, item, price, dateFormat.format(date_of_buy), category, description});
+    private void editPayment(int id, String item, float price, Date date_of_buy, String category, String description, String receiptId) {
+        db.execSQL("replace into payments(id, item, price, date_of_buy, category, description, receiptId) VALUES(?,?,?,?,?,?,?);",
+                new Object[]{id, item, price, dateFormat.format(date_of_buy), category, description, receiptId});
         clearCategories();
     }
 
@@ -113,7 +109,7 @@ public class Database {
     }
     private ArrayList<Payment> filterPayment(float priceMin, float priceMax, Date dateMin, Date dateMax, String category, String predicate) {
         ArrayList<Payment> ret =  paymentsSelectQ( "" +
-                " select id, item, price, date_of_buy, category, description" +
+                " select id, item, price, date_of_buy, category, description, receiptId" +
                 " from payments" +
                 " where " +
                         " (date_of_buy >= ?) and" +
@@ -130,6 +126,7 @@ public class Database {
     public void deletePayment(int id) {
         db.execSQL("DELETE FROM payments WHERE id = ?;", new Object[]{id});
         clearCategories();
+        clearReceipts();
     }
 
     private ArrayList<Payment> paymentsSelectQ(String query, String[] args) {
@@ -155,7 +152,8 @@ public class Database {
                 .setPrice(res.getFloat(2))
                 .setDate_of_buy(dateFormat.parse(res.getString(3)))
                 .setCategory(res.getString(4))
-                .setDescription(res.getString(5));
+                .setDescription(res.getString(5))
+                .setReceipt(getReceipt(res.getString(6)));
     }
 
     public Pair<Float, Float> getPriceBoundaries(Date from, Date to, String category) {
@@ -213,47 +211,6 @@ public class Database {
         return ret;
     }
 
-    public ArrayList<Limit> getLimitsByCategory(String category) {
-        ArrayList<Limit> ret = new ArrayList<>();
-        Cursor res = db.rawQuery("select l.id, name, value, days, categories as category, sum(price) as spent" +
-                " from" +
-                " (" +
-                "   WITH split(id, name, days, value, categories, cat, str) AS (" +
-                "   SELECT id, name, days, value, category as categories, '', category||',' from limits" +
-                "   UNION ALL SELECT" +
-                "   id," +
-                "   name," +
-                "   days," +
-                "   value," +
-                "   categories," +
-                "   substr(str, 0, instr(str, ','))," +
-                "   substr(str, instr(str, ',')+1)" +
-                "   FROM split WHERE str!=''" +
-                "   ) SELECT * FROM split WHERE (cat!='') and id in" +
-                "       (WITH split(id, cat, str) AS (" +
-                "       SELECT id, '', category||',' from limits" +
-                "       UNION ALL SELECT" +
-                "       id," +
-                "       substr(str, 0, instr(str, ','))," +
-                "       substr(str, instr(str, ',')+1)" +
-                "       FROM split WHERE str!=''" +
-                "       ) SELECT id FROM split WHERE trim(cat) = ('''' || ? || ''''))" +
-                " ) l left join payments p on ((('''' || category || '''') = trim(cat)) and (date_of_buy > date('now', '-' || days || ' day')))" +
-                " GROUP by l.id", new String[]{category});
-        while (res.moveToNext()) {
-            ret.add(new Limit()
-                    .setId(res.getInt(0))
-                    .setName(res.getString(1))
-                    .setValue(res.getFloat(2))
-                    .setDays(res.getInt(3))
-                    .setCategory(res.getString(4))
-                    .setSpent(res.getFloat(5)));
-        }
-        res.close();
-        ret.removeIf(x->(x.spent <= x.value));
-        return ret;
-    }
-
     public void createLimit(Limit limit) {
         db.execSQL("insert into limits(name, value, days, category) VALUES(?,?,?,?);",
                 new Object[]{limit.name, limit.value, limit.days, limit.category});
@@ -266,6 +223,47 @@ public class Database {
 
     public void deleteLimit(int id) {
         db.execSQL("DELETE FROM limits WHERE id = ?;", new Object[]{id});
+    }
+
+    public boolean createReceipt(String id, String merchant, Object[] items) {
+        boolean success = true;
+        db.beginTransaction();
+        try {
+            db.execSQL("insert into receipt(id, merchant) VALUES(?,?);", new Object[]{id, merchant});
+            for (int i = 0; i < items.length; i+=3) {
+                db.execSQL("insert into receiptItems(receiptId, name, price, quantity) VALUES(?,?,?,?);", new Object[]{id, items[i], items[i+1], items[i+2]});
+            }
+            db.setTransactionSuccessful();
+        } catch (SQLException ignored) {
+            success = false;
+        }
+        finally {
+            db.endTransaction();
+        }
+        return success;
+    }
+
+    private Receipt getReceipt(String receiptId) {
+        if (receiptId.isEmpty()) return null;
+        Cursor res = db.rawQuery( "SELECT merchant FROM receipt WHERE id=?", new String[]{receiptId} );
+        if (!res.moveToFirst()) return null;
+        Receipt ret = new Receipt().setId(receiptId).setMechant(res.getString(0));
+        res.close();
+
+        ArrayList<Receipt.Item> items = new ArrayList<>();
+        res = db.rawQuery( "SELECT name, price, quantity FROM receiptItems WHERE receiptId=?", new String[]{receiptId} );
+        while(res.moveToNext())
+            items.add(new Receipt.Item().setName(res.getString(0)).setPrice(res.getFloat(1)).setQuantity(res.getInt(2)));
+        res.close();
+
+        return ret.setItems(items);
+    }
+
+    private void clearReceipts() {
+        db.execSQL("DELETE FROM receiptItems WHERE receiptId not in" +
+                "(SELECT receiptId from payments GROUP BY receiptId);", new Object[]{});
+        db.execSQL("DELETE FROM receipt WHERE id not in" +
+                "(SELECT receiptId from payments GROUP BY receiptId);", new Object[]{});
     }
 
 }

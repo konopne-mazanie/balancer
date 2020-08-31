@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Locale;
 
 public class ReceiptAPI {
     private static final String ekasaURL = "https://ekasa.financnasprava.sk/mdu/api/v1/opd/receipt/find";
@@ -45,26 +44,34 @@ public class ReceiptAPI {
     public static void createPayment(String jsonString) throws JSONException {
         if (db == null) db = Database.getInstance();
         JSONObject json = new JSONObject(jsonString).getJSONObject("receipt");
+        String receiptId = json.getString("receiptId");
         String shopName = json.getJSONObject("organization").getString("name").toLowerCase().replaceAll("[^\\w\\s]"," ");
         JSONArray items = json.getJSONArray("items");
-        String onlyOneItemName = "";
-        if (items.length() == 1) {
-            onlyOneItemName = items.getJSONObject(0).getString("name").toLowerCase().replaceAll("[^\\w\\s]"," ");
-            onlyOneItemName = " (" + onlyOneItemName.substring(0, Math.min(onlyOneItemName.length(), 10)) + ")";
-        }
-        StringBuilder description = new StringBuilder(shopName).append("\n").append(json.getString("receiptId"));
-        for (int i = 0; i < items.length(); i++) {
-            JSONObject item = items.getJSONObject(i);
-            description.append("\n").append(String.format(Locale.ENGLISH, "%s | %.02f | %d",
-                    item.getString("name").toLowerCase(), item.getDouble("price"), item.getInt("quantity")));
+
+        Object[] itemsForDb = new Object[items.length() * 3];
+        int i = 0;
+        for (int j = 0; j < items.length(); j++) {
+            JSONObject item = items.getJSONObject(j);
+            itemsForDb[i++] = item.getString("name").toLowerCase();
+            itemsForDb[i++] = item.getDouble("price");
+            itemsForDb[i++] = item.getInt("quantity");
         }
 
+        String onlyOneItemName = "";
+        if (itemsForDb.length == 3) {
+            onlyOneItemName = ((String) itemsForDb[0]).toLowerCase().replaceAll("[^\\w\\s]"," ");
+            onlyOneItemName = " (" + onlyOneItemName.substring(0, Math.min(onlyOneItemName.length(), 10)) + ")";
+        }
+
+        if (!db.createReceipt(receiptId, shopName, itemsForDb)) throw new JSONException("invalid receipt");
         db.ensureCategory(".qr");
-        db.createPayment(new Payment()
-                .setItem(shopName.substring(0, Math.min(shopName.length(), 10)) + onlyOneItemName)
-                .setDate_of_buy(DateCommon.parseDateGUI((json.getString("issueDate").split(" "))[0]))
-                .setPrice(((float) Math.round(json.getDouble("totalPrice") * 100)) / 100)
-                .setDescription(description.toString())
-                .setCategory(".qr"));
+        db.createPayment(
+                shopName.substring(0, Math.min(shopName.length(), 10)) + onlyOneItemName,
+                ((float) Math.round(json.getDouble("totalPrice") * 100)) / 100,
+                DateCommon.parseDateGUI((json.getString("issueDate").split(" "))[0]),
+                ".qr",
+                "",
+                receiptId
+        );
     }
 }

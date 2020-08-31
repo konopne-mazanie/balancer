@@ -9,6 +9,7 @@ public class Payment {
     public Date date_of_buy;
     public String category;
     public String description;
+    public Receipt receipt;
 
     public Payment setId(int id) {
         this.id = id;
@@ -37,6 +38,11 @@ public class Payment {
 
     public Payment setDescription(String description) {
         this.description = description;
+        return this;
+    }
+
+    public Payment setReceipt(Receipt receipt) {
+        this.receipt = receipt;
         return this;
     }
 }

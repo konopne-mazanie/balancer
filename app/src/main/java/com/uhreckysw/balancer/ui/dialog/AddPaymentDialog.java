@@ -14,7 +14,6 @@ import androidx.databinding.DataBindingUtil;
 import com.uhreckysw.balancer.BR;
 import com.uhreckysw.balancer.R;
 import com.uhreckysw.balancer.backend.DateCommon;
-import com.uhreckysw.balancer.backend.db.Payment;
 import com.uhreckysw.balancer.databinding.DialogAddBinding;
 import com.uhreckysw.balancer.ui.MyArrayAdapter;
 import com.uhreckysw.balancer.ui.interfaces.ICategoryDialog;
@@ -135,12 +134,14 @@ public class AddPaymentDialog extends MyDialog implements ICategoryDialog {
     public void onConfirm() {
         if (validate()) {
             try {
-                db.createPayment(new Payment()
-                        .setItem(itemNameField.getText().toString())
-                        .setDate_of_buy(DateCommon.parseDateGUI(getItemDateFieldText()))
-                        .setPrice(((float) Math.round(Float.parseFloat(getItemPriceFieldText().replace(",", ".")) * 100)) / 100)
-                        .setDescription(getItemDescriptionFieldText())
-                        .setCategory(categoryList.getSelectedItem().toString()));
+                db.createPayment(
+                        itemNameField.getText().toString(),
+                        ((float) Math.round(Float.parseFloat(getItemPriceFieldText().replace(",", ".")) * 100)) / 100,
+                        DateCommon.parseDateGUI(getItemDateFieldText()),
+                        categoryList.getSelectedItem().toString(),
+                        getItemDescriptionFieldText(),
+                        ((clickedItem == null) || (clickedItem.payment.receipt == null)) ? "" : clickedItem.payment.receipt.id
+                );
             } catch (Exception e) {
                 ((EditText) dialogLayout.findViewById(R.id.item_payed_date)).setError(parentActivity.getString(R.string.required_field));
                 return;
