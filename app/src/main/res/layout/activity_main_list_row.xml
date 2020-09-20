@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <data>
         <import type="android.view.View"/>
         <variable
@@ -94,6 +95,18 @@
             android:id="@+id/item_description"
             android:text="@{viewmodel.description}"
             android:textSize="15sp" />
+
+        <WebView
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/item_description"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:id="@+id/item_description_web"
+            app:loadUrl="@{viewmodel.description_web}"
+            tools:ignore="WebViewLayout"
+        />
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/copy_button"
