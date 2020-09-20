@@ -2,6 +2,7 @@ package com.uhreckysw.balancer.backend.db;
 
 import android.database.Cursor;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Pair;
 
@@ -234,8 +235,8 @@ public class Database {
                 db.execSQL("insert into receiptItems(receiptId, name, price, quantity) VALUES(?,?,?,?);", new Object[]{id, items[i], items[i+1], items[i+2]});
             }
             db.setTransactionSuccessful();
-        } catch (SQLException ignored) {
-            success = false;
+        } catch (SQLException e) {
+            success = (e instanceof SQLiteConstraintException); // receipt already is in database
         }
         finally {
             db.endTransaction();
@@ -261,9 +262,9 @@ public class Database {
 
     private void clearReceipts() {
         db.execSQL("DELETE FROM receiptItems WHERE receiptId not in" +
-                "(SELECT receiptId from payments GROUP BY receiptId);", new Object[]{});
+                "(SELECT DISTINCT receiptId from payments);", new Object[]{});
         db.execSQL("DELETE FROM receipt WHERE id not in" +
-                "(SELECT receiptId from payments GROUP BY receiptId);", new Object[]{});
+                "(SELECT DISTINCT receiptId from payments);", new Object[]{});
     }
 
 }
