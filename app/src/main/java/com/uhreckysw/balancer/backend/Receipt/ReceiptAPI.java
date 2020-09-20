@@ -2,7 +2,6 @@ package com.uhreckysw.balancer.backend.Receipt;
 
 import com.uhreckysw.balancer.backend.DateCommon;
 import com.uhreckysw.balancer.backend.db.Database;
-import com.uhreckysw.balancer.backend.db.Payment;
 
 import org.json.JSONArray;
 import org.json.JSONException;

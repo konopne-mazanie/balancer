@@ -25,7 +25,8 @@ public final class EditPaymentDialog extends AddPaymentDialog {
                     .setPrice(((float) Math.round(Float.parseFloat(getItemPriceFieldText().replace(",", "."))*100))/100)
                     .setDescription(getItemDescriptionFieldText())
                     .setCategory(categoryList.getSelectedItem().toString())
-                    .setId(clickedItem.payment.id));
+                    .setId(clickedItem.payment.id)
+                    .setReceipt(clickedItem.payment.receipt));
             } catch (Exception e) {
                 ((EditText) dialogLayout.findViewById(R.id.item_payed_date)).setError(parentActivity.getString(R.string.required_field));
                 return;

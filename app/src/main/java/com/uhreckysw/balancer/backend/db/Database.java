@@ -52,7 +52,7 @@ public class Database {
                         "id varchar(50) PRIMARY key," +
                         "merchant varchar(50));");
                 db.execSQL("create table receiptItems(" +
-                        "receiptId varchar(50) PRIMARY key," +
+                        "receiptId varchar(50)," +
                         "name varchar(50) not null," +
                         "price float," +
                         "quantity integer," +
