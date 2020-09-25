@@ -14,11 +14,12 @@ import com.uhreckysw.balancer.ui.interfaces.LambdaVoidInt;
 public class PaymentUIElem extends BaseObservable {
 
     private static final String description_web_pre_html =
-            "<html>" +
-            "<body style=\"margin: 0px; padding: 0px; background-color: transparent;\">" +
+            "<html><body style=\"margin: 0px; padding: 0px; background-color: transparent;\">" +
             "<table style=\"margin-left: -10px; padding: 0px; border-spacing: 10px 0;" +
-                    "color: rgba(0, 0, 0, 0.6); font-family: 'Roboto'; font-size: 0.97em;\"" +
-                    " cellspacing=\"0\" cellpadding=\"0\">";
+                    "color: rgba(0, 0, 0, 0.6); font-size: 0.97em;\"" +
+                    " cellspacing=\"0\" cellpadding=\"0\">%s</table>" +
+            "<p style=\"color: rgba(0, 0, 0, 0.6); font-size: 0.7em;\">%s</p>" +
+            "</body></html>";
 
     private final String item;
     private final String price;
@@ -42,11 +43,11 @@ public class PaymentUIElem extends BaseObservable {
         this.description = payment.description;
 
         if (payment.receipt != null) {
-            StringBuilder description_web = new StringBuilder(description_web_pre_html);
+            StringBuilder description_web = new StringBuilder();
             payment.receipt.items.forEach((item) ->
                 description_web.append(String.format("<tr><td>%s<td>%s<td>%s", item.name, item.quantity, item.price))
             );
-            this.description_web = description_web.append("</table></body></html>").toString();
+            this.description_web = String.format(description_web_pre_html, description_web.toString(), payment.receipt.id);
         } else description_web = "";
     }
 

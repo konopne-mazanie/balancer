@@ -117,8 +117,16 @@ public class Database {
                         " (date_of_buy <= ?)" +
                         (((category == null) || category.isEmpty()) ? "" : " and category in (" + category + ")") +
                         (((predicate == null) || predicate.isEmpty()) ? "" :
-                                " and ((lower(item) like '%' || lower('" + predicate
-                                        + "') || '%') or (lower(description) like '%' || lower('" + predicate + "') || '%'))") +
+                                " and (" +
+                                        "(lower(item) like '%' || lower('" + predicate + "') || '%')" +
+                                        " or (lower(description) like '%' || lower('" + predicate + "') || '%')" +
+                                        " or (receiptId = '" + predicate + "')" +
+                                        " or (exists(" +
+                                            "select 1 from receiptItems where" +
+                                                " (receiptItems.receiptId = payments.receiptId) and" +
+                                                " (lower(name) like '%' || lower('" + predicate + "') || '%')" +
+                                            ") )" +
+                                ")") +
                 " order by date_of_buy desc", new String[]{dateFormat.format(dateMin), dateFormat.format(dateMax)});
         ret.removeIf(x->(x.price < priceMin) || (x.price > priceMax));
         return ret;

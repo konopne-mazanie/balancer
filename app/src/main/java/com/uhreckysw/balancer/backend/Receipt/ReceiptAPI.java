@@ -44,21 +44,21 @@ public class ReceiptAPI {
         if (db == null) db = Database.getInstance();
         JSONObject json = new JSONObject(jsonString).getJSONObject("receipt");
         String receiptId = json.getString("receiptId");
-        String shopName = json.getJSONObject("organization").getString("name").toLowerCase().replaceAll("[^\\w\\s]"," ");
+        String shopName = json.getJSONObject("organization").getString("name").toLowerCase().trim().replaceAll("[^\\w\\s]"," ");
         JSONArray items = json.getJSONArray("items");
 
         Object[] itemsForDb = new Object[items.length() * 3];
         int i = 0;
         for (int j = 0; j < items.length(); j++) {
             JSONObject item = items.getJSONObject(j);
-            itemsForDb[i++] = item.getString("name").toLowerCase();
+            itemsForDb[i++] = item.getString("name").toLowerCase().trim();
             itemsForDb[i++] = item.getDouble("price");
             itemsForDb[i++] = item.getInt("quantity");
         }
 
         String onlyOneItemName = "";
         if (itemsForDb.length == 3) {
-            onlyOneItemName = ((String) itemsForDb[0]).toLowerCase().replaceAll("[^\\w\\s]"," ");
+            onlyOneItemName = ((String) itemsForDb[0]).toLowerCase().trim().replaceAll("[^\\w\\s]"," ");
             onlyOneItemName = " (" + onlyOneItemName.substring(0, Math.min(onlyOneItemName.length(), 10)) + ")";
         }
 
