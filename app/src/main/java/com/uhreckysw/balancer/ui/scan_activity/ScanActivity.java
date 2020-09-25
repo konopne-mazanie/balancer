@@ -8,6 +8,7 @@ import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -110,13 +111,18 @@ public class ScanActivity extends AppCompatActivity implements IUpdatable {
         initialiseDetectorsAndSources();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if ((requestCode == 201) && (grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) startCamera();
+    }
+
     private void startCamera() {
         try {
-            if (ActivityCompat.checkSelfPermission(ScanActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                cameraSource.start(surfaceView.getHolder());
-            } else {
+            if (ActivityCompat.checkSelfPermission(ScanActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(ScanActivity.this, new String[]{Manifest.permission.CAMERA}, 201);
+                return;
             }
+            cameraSource.start(surfaceView.getHolder());
         } catch (IOException e) {
             new ErrDialog(ScanActivity.this, ScanActivity.this, getString(R.string.camera_error)).show();
         }
