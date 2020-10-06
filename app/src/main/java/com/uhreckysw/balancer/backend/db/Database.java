@@ -27,7 +27,7 @@ public class Database {
         db = SQLiteDatabase.openOrCreateDatabase(Balancer.getContext().getFilesDir().toString() + "/db.sqlite",null);
         db.execSQL("PRAGMA foreign_keys=ON;");
         db.execSQL("create table if not exists version(nr integer PRIMARY key);");
-        db.execSQL("replace into version(nr) values(0);");
+        db.execSQL("insert or ignore into version(nr) values(0);");
 
         // migrate
         switch (getVersion()) {
@@ -58,7 +58,7 @@ public class Database {
                         "price float," +
                         "quantity integer," +
                         "FOREIGN key (receiptId) REFERENCES receipt(id));");
-                db.execSQL("alter table payments add column receiptId varchar(50);");
+                db.execSQL("alter table payments add column receiptId varchar(50) not null default '';");
                 db.execSQL("insert into version(nr) values(2);");
             default:
                 ;
