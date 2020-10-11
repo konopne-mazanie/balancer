@@ -103,7 +103,7 @@ public class AddPaymentDialog extends MyDialog implements ICategoryDialog {
         setItemPriceFieldText(clickedItem.getPrice());
         setCategory(clickedItem.payment.category);
         setItemDateFieldText(DateCommon.dateFormatGUI.format(clickedItem.payment.date_of_buy));
-        setItemDescriptionFieldText(clickedItem.getDescription());
+        setItemDescriptionFieldText(clickedItem.payment.description);
     }
 
     public void onCancel() {
