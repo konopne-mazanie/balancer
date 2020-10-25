@@ -1,13 +1,20 @@
 package com.uhreckysw.balancer.backend.db;
 
+import android.content.ContentResolver;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.util.Pair;
 
 import com.uhreckysw.balancer.Balancer;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,12 +26,14 @@ public class Database {
         return ourInstance;
     }
 
-    private final SQLiteDatabase db;
+    private SQLiteDatabase db;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private final String dbLocation;
 
     private Database() {
         // initialize
-        db = SQLiteDatabase.openOrCreateDatabase(Balancer.getContext().getFilesDir().toString() + "/db.sqlite",null);
+        dbLocation = Balancer.getContext().getFilesDir().toString() + "/db.sqlite";
+        db = SQLiteDatabase.openOrCreateDatabase(dbLocation,null);
         db.execSQL("PRAGMA foreign_keys=ON;");
         db.execSQL("create table if not exists version(nr integer PRIMARY key);");
         db.execSQL("insert or ignore into version(nr) values(0);");
@@ -59,9 +68,10 @@ public class Database {
                         "quantity integer," +
                         "FOREIGN key (receiptId) REFERENCES receipt(id));");
                 db.execSQL("alter table payments add column receiptId varchar(50) not null default '';");
+                db.execSQL("update payments set receiptId='' where receiptId is null");
                 db.execSQL("insert into version(nr) values(2);");
             default:
-                ;
+                ; // possible optimization of receiptItems -> unique key (receiptId, name)
         }
     }
 
@@ -71,6 +81,35 @@ public class Database {
         int ret = res.getInt(0);
         res.close();
         return ret;
+    }
+
+    public void backup(ContentResolver contentResolver, Uri dest) throws IOException {
+        db.close();
+        try (InputStream src = new FileInputStream(dbLocation)) {
+            try (OutputStream out = contentResolver.openOutputStream(dest)) {
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = src.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+            }
+        } finally {
+            db = SQLiteDatabase.openDatabase(dbLocation,null, 0);
+        }
+    }
+
+    public void restore(ContentResolver contentResolver, Uri dest) throws IOException {
+        try (OutputStream out = new FileOutputStream(dbLocation)) {
+            try (InputStream src = contentResolver.openInputStream(dest)) {
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = src.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+            }
+        } finally {
+            db = SQLiteDatabase.openDatabase(dbLocation,null, 0);
+        }
     }
 
     public void createCategory(String name) {

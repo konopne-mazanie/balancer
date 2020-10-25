@@ -33,6 +33,7 @@ import com.uhreckysw.balancer.ui.interfaces.IUpdatable;
 import com.uhreckysw.balancer.ui.interfaces.ItemClickListener;
 import com.uhreckysw.balancer.ui.interfaces.LambdaVoidInt;
 import com.uhreckysw.balancer.ui.scan_activity.ScanActivity;
+import com.uhreckysw.balancer.ui.settings_activity.SettingsActivity;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,6 +43,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class PaymentView extends Fragment implements ItemClickListener, IUpdatable {
+
+
+    private final int SCAN_ACTIVITY_REQ_CODE = 1;
+    private final int SETTINGS_ACTIVITY_REQ_CODE = 2;
+
     Database db;
     String nameFilter = "";
     Filter filter;
@@ -215,7 +221,11 @@ public class PaymentView extends Fragment implements ItemClickListener, IUpdatab
     }
 
     public void onScanItem() {
-        startActivityForResult(new Intent(parentActivity, ScanActivity.class), 1);
+        startActivityForResult(new Intent(parentActivity, ScanActivity.class), SCAN_ACTIVITY_REQ_CODE);
+    }
+
+    public void onSwitchSettings() {
+        startActivityForResult(new Intent(parentActivity, SettingsActivity.class), SETTINGS_ACTIVITY_REQ_CODE);
     }
 
     public void onInvokeFilters() {
@@ -251,7 +261,7 @@ public class PaymentView extends Fragment implements ItemClickListener, IUpdatab
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        if ((requestCode == 1) && (data != null)) {
+        if ((requestCode == SCAN_ACTIVITY_REQ_CODE) && (data != null)) {
             findField.setText(data.getStringExtra("receiptId"));
             AtomicBoolean updateFinished = new AtomicBoolean(false);
             update(updateFinished);
@@ -263,6 +273,8 @@ public class PaymentView extends Fragment implements ItemClickListener, IUpdatab
                     new ChangeCategoryDialog(parentActivity, this, paymentListViewAdapter.mData).show();
                 });
             }).start();
+        } else if (requestCode == SETTINGS_ACTIVITY_REQ_CODE) {
+            update();
         }
     }
 

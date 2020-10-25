@@ -38,4 +38,8 @@
     <string name="camera_error">Camera error!</string>
     <string name="internet_error">No internet connection!</string>
     <string name="qr_format_error">Unknown QR Code format! Only receipts of the merchants registered in slovakian financial office are supported.</string>
+    <string name="settings">Settings</string>
+    <string name="import_export">BACKUP/RESTORE</string>
+    <string name="backup">BACKUP</string>
+    <string name="restore">RESTORE</string>
 </resources>

@@ -39,4 +39,8 @@
     <string name="camera_error">Chyba kamery!</string>
     <string name="internet_error">Nedostupné internetové pripojenie!</string>
     <string name="qr_format_error">Neznámy formát QR kódu! Podporované sú iba pokladničné doklady obchodníkov registrovaných na finančnej správe.</string>
+    <string name="settings">Nastavenia</string>
+    <string name="import_export">ZÁLOHOVAŤ/OBNOVIŤ</string>
+    <string name="backup">ZÁLOHOVAŤ</string>
+    <string name="restore">OBNOVIŤ</string>
 </resources>

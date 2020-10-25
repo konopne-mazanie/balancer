@@ -193,7 +193,7 @@
                 android:onClick="@{(view)->viewmodel.onInvokeFilters()}"
                 />
             <androidx.appcompat.widget.AppCompatImageButton
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/switch_settings_button"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
 
@@ -204,6 +204,19 @@
                 style="@android:style/Widget.Material.Light.Button.Borderless.Colored"
                 android:src="@drawable/ic_limits"
                 android:onClick="@{(view)->viewmodel.onSwitchLimis()}"
+                />
+            <androidx.appcompat.widget.AppCompatImageButton
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+
+                android:id="@+id/switch_settings_button"
+                android:layout_height="match_parent"
+                android:layout_width="35dp"
+
+                style="@android:style/Widget.Material.Light.Button.Borderless.Colored"
+                android:src="@drawable/ic_settings"
+                android:onClick="@{(view)->viewmodel.onSwitchSettings()}"
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
