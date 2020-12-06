@@ -36,8 +36,10 @@ public class PaymentUIElem extends BaseObservable {
 
         StringBuilder description = new StringBuilder(payment.description.isEmpty() ? "" : (payment.description + "\n\n"));
         if (payment.receipt != null) {
-            String tableFormat = getReceiptTableFormat(payment.receipt.items);
-            payment.receipt.items.forEach((item) -> description.append(String.format(tableFormat, item.name, item.quantity, item.price)));
+            int[] fieldSize = getReceiptTableFieldSize(payment.receipt.items);
+            String tableFormat = "  %-" + fieldSize[1] + "d" + "  %-" + fieldSize[2] + ".02f\n";
+            payment.receipt.items.forEach((item) -> description.append(receiptTableFitString(item.name.trim().replaceAll(" +", " "), fieldSize[0]))
+                                                                .append(String.format(tableFormat, item.quantity, item.price)));
             description.append("\n").append(payment.receipt.id);
         }
         this.description = description.toString();
@@ -104,17 +106,31 @@ public class PaymentUIElem extends BaseObservable {
 
     // ############################################################################################
 
-    String getReceiptTableFormat(ArrayList<Receipt.Item> items) {
+    private static int[] getReceiptTableFieldSize(ArrayList<Receipt.Item> items) {
         int max_name_length, max_quantity_length, max_price_length;
         max_name_length = max_quantity_length = max_price_length = 0;
 
-        for (Receipt.Item item : payment.receipt.items) {
-            if (item.name.length() > max_name_length) max_name_length = item.name.length();
-            int quantity_length = Tools.int_length(item.quantity);
-            if (quantity_length > max_quantity_length) max_quantity_length = quantity_length;
-            int price_length = Tools.int_length((int) item.price);
-            if (price_length > max_price_length) max_price_length = price_length;
+        for (Receipt.Item item : items) {
+            max_name_length = Math.max(max_name_length, item.name.length());
+            max_quantity_length = Math.max(max_quantity_length, Tools.int_length(item.quantity));
+            max_price_length = Math.max(max_price_length, Tools.int_length((int) item.price));
         }
-        return("%-" + max_name_length + "s" + "  %-" + max_quantity_length + "d" + "  %-" + max_price_length + ".02f\n");
+
+        return (new int[]{
+                (int) ((max_name_length + max_price_length + max_quantity_length + 4)/1.8),
+                max_quantity_length,
+                (max_price_length + 5)
+        });
+    }
+
+    private static String receiptTableFitString(String input, int maxlenght) {
+        if (input.length() > maxlenght) {
+            int splitpos = input.substring(0, maxlenght).lastIndexOf(' ');
+            if (splitpos < 1) splitpos = maxlenght;
+            return (receiptTableFitString(input.substring(0, splitpos), maxlenght)
+                    + "\n"
+                    + receiptTableFitString(input.substring(splitpos), maxlenght));
+        }
+        return String.format("%-" + maxlenght + "s", input);
     }
 }

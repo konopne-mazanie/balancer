@@ -87,7 +87,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
 
-            android:paddingEnd="60dp"
+            android:paddingEnd="65dp"
             android:textAlignment="viewStart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
