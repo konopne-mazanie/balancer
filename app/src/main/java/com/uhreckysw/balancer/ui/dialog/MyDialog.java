@@ -33,6 +33,14 @@ public abstract class MyDialog extends BaseObservable {
         dialog.show();
     }
 
+    public boolean isShowing() {
+        return dialog.isShowing();
+    }
+
+    public void cancel() {
+        dialog.cancel();
+    }
+
     abstract void update();
     abstract void bind();
 }

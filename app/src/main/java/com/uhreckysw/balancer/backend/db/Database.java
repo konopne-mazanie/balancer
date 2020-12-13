@@ -10,6 +10,7 @@ import android.util.Pair;
 
 import com.uhreckysw.balancer.Balancer;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,9 +29,12 @@ public class Database {
 
     private SQLiteDatabase db;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    private final String dbLocation;
+    private String dbLocation;
 
     private Database() {
+        init();
+    }
+    private void init() {
         // initialize
         dbLocation = Balancer.getContext().getFilesDir().toString() + "/db.sqlite";
         db = SQLiteDatabase.openOrCreateDatabase(dbLocation,null);
@@ -98,8 +102,8 @@ public class Database {
         }
     }
 
-    public void restore(ContentResolver contentResolver, Uri dest) throws IOException {
-        try (OutputStream out = new FileOutputStream(dbLocation)) {
+    public void restore(ContentResolver contentResolver, Uri dest) throws Exception {
+        try (OutputStream out = new FileOutputStream(dbLocation + ".tmp")) {
             try (InputStream src = contentResolver.openInputStream(dest)) {
                 byte[] buf = new byte[1024];
                 int len;
@@ -108,7 +112,11 @@ public class Database {
                 }
             }
         } finally {
-            db = SQLiteDatabase.openDatabase(dbLocation,null, 0);
+            SQLiteDatabase.openDatabase(dbLocation + ".tmp",null, 0).close();
+            db.close();
+            new File(dbLocation).delete();
+            new File(dbLocation + ".tmp").renameTo(new File(dbLocation));
+            init();
         }
     }
 

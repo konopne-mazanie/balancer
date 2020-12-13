@@ -43,4 +43,6 @@
     <string name="import_export">ZÁLOHOVAŤ/OBNOVIŤ</string>
     <string name="backup">ZÁLOHOVAŤ</string>
     <string name="restore">OBNOVIŤ</string>
+    <string name="fileoperror">Nesprávna cesta alebo chybný súbor!</string>
+    <string name="restore_msg_rlly">Toto vymaže všetky Vaše údaje. Naozaj chcete pokračovať?</string>
 </resources>
