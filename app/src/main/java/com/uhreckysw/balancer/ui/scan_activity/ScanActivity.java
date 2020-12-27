@@ -113,7 +113,13 @@ public class ScanActivity extends AppCompatActivity implements IUpdatable {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if ((requestCode == 201) && (grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) startCamera();
+        if (
+                (requestCode != 201)
+                || (grantResults.length == 0)
+                || (grantResults[0] != PackageManager.PERMISSION_GRANTED)
+        ) return;
+        initialiseDetectorsAndSources();
+        startCamera();
     }
 
     private void startCamera() {
