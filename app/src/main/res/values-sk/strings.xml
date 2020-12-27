@@ -45,4 +45,7 @@
     <string name="restore">OBNOVIŤ</string>
     <string name="fileoperror">Nesprávna cesta alebo chybný súbor!</string>
     <string name="restore_msg_rlly">Toto vymaže všetky Vaše údaje. Naozaj chcete pokračovať?</string>
+    <string name="about">O APLIKÁCII</string>
+    <string name="author">Autor</string>
+    <string name="version">Verzia</string>
 </resources>

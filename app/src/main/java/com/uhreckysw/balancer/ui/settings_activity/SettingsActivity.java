@@ -28,11 +28,18 @@ public class SettingsActivity extends AppCompatActivity implements IUpdatable {
 
     private ConfirmRestoreDialog confirmRestoreDialog;
     public Observable observable = new Observable();
+    public String appAboutText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         confirmRestoreDialog = new ConfirmRestoreDialog(SettingsActivity.this, SettingsActivity.this);
+        appAboutText = "Balancer\n" + getString(R.string.author) + ": Peter Uhrecky\n" + getString(R.string.version) + " ";
+        try {
+            appAboutText += getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (Exception e) {
+            appAboutText += "0.0";
+        }
         ((ActivitySettingsBinding) (DataBindingUtil.setContentView(this, R.layout.activity_settings))).setViewmodel(this);
     }
 

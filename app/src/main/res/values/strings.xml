@@ -44,4 +44,7 @@
     <string name="restore">RESTORE</string>
     <string name="fileoperror">Wrong path or file!</string>
     <string name="restore_msg_rlly">This will wipe out your current data. Do you really proceed?</string>
+    <string name="about">ABOUT</string>
+    <string name="author">Author</string>
+    <string name="version">Version</string>
 </resources>
