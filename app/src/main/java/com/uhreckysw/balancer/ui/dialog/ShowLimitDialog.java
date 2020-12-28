@@ -34,7 +34,7 @@ public final class ShowLimitDialog extends MyDialog {
         Date currrentDate = new Date();
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(currrentDate);
-        calendar.add(Calendar.DATE, -1 * (item.limit.days - 1));
+        calendar.add(Calendar.DATE, -1 * (item.limit.days));
         Pair<Float, Float> priceBoundaries = db.getPriceBoundaries(calendar.getTime(), currrentDate, item.limit.category);
         ((MainActivity) parentActivity).paymentView.setFilter(
                 new Filter()
